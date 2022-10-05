@@ -39,6 +39,7 @@
             this._decryptOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.buttonClearKey = new System.Windows.Forms.Button();
             this.buttonImportKeyFromXml = new System.Windows.Forms.Button();
+            this.buttonKeyExist = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonEncryptFile
@@ -138,11 +139,22 @@
             this.buttonImportKeyFromXml.UseVisualStyleBackColor = true;
             this.buttonImportKeyFromXml.Click += new System.EventHandler(this.buttonImportKeyFromXml_Click);
             // 
+            // buttonKeyExist
+            // 
+            this.buttonKeyExist.Location = new System.Drawing.Point(657, 177);
+            this.buttonKeyExist.Name = "buttonKeyExist";
+            this.buttonKeyExist.Size = new System.Drawing.Size(75, 23);
+            this.buttonKeyExist.TabIndex = 9;
+            this.buttonKeyExist.Text = "buttonKeyExist ?";
+            this.buttonKeyExist.UseVisualStyleBackColor = true;
+            this.buttonKeyExist.Click += new System.EventHandler(this.buttonKeyExist_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonKeyExist);
             this.Controls.Add(this.buttonImportKeyFromXml);
             this.Controls.Add(this.buttonClearKey);
             this.Controls.Add(this.label1);
@@ -172,6 +184,7 @@
         private System.Windows.Forms.OpenFileDialog _decryptOpenFileDialog;
         private System.Windows.Forms.Button buttonClearKey;
         private System.Windows.Forms.Button buttonImportKeyFromXml;
+        private System.Windows.Forms.Button buttonKeyExist;
     }
 }
 

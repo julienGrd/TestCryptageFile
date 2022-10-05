@@ -16,7 +16,6 @@ namespace TestCryptageFile
     {
         // Declare CspParmeters and RsaCryptoServiceProvider
         // objects with global scope of your Form class.
-        readonly CspParameters _cspp = new CspParameters();
         RSACryptoServiceProvider _rsa;
 
         // Path variables for source, encryption, and
@@ -40,16 +39,19 @@ namespace TestCryptageFile
         private void buttonCreateAsmKeys_Click(object sender, EventArgs e)
         {
             // Stores a key pair in the key container.
-            _cspp.KeyContainerName = KeyName;
-            _cspp.Flags = CspProviderFlags.UseMachineKeyStore;
-            _rsa = new RSACryptoServiceProvider(_cspp)
+            var parameters = new CspParameters
+            {
+                KeyContainerName = KeyName,
+                Flags = CspProviderFlags.UseMachineKeyStore
+            };
+            _rsa = new RSACryptoServiceProvider(parameters)
             {
                 PersistKeyInCsp = true
             };
 
             label1.Text = _rsa.PublicOnly
-                ? $"Key: {_cspp.KeyContainerName} - Public Only"
-                : $"Key: {_cspp.KeyContainerName} - Full Key Pair";
+                ? $"Key: {parameters.KeyContainerName} - Public Only"
+                : $"Key: {parameters.KeyContainerName} - Full Key Pair";
         }
 
         private void buttonEncryptFile_Click(object sender, EventArgs e)
@@ -275,30 +277,38 @@ namespace TestCryptageFile
         {
             using (var sr = new StreamReader(PubKeyFile))
             {
-                _cspp.KeyContainerName = KeyName;
-                _rsa = new RSACryptoServiceProvider(_cspp);
+                var parameters = new CspParameters
+                {
+                    KeyContainerName = KeyName,
+                    Flags = CspProviderFlags.UseMachineKeyStore
+                };
+                _rsa = new RSACryptoServiceProvider(parameters);
 
                 string keytxt = sr.ReadToEnd();
                 _rsa.FromXmlString(keytxt);
                 _rsa.PersistKeyInCsp = true;
 
                 label1.Text = _rsa.PublicOnly
-                    ? $"Key: {_cspp.KeyContainerName} - Public Only"
-                    : $"Key: {_cspp.KeyContainerName} - Full Key Pair";
+                    ? $"Key: {parameters.KeyContainerName} - Public Only"
+                    : $"Key: {parameters.KeyContainerName} - Full Key Pair";
             }
         }
 
         private void buttonGetPrivateKey_Click(object sender, EventArgs e)
         {
-            _cspp.KeyContainerName = KeyName;
-            _rsa = new RSACryptoServiceProvider(_cspp)
+            var parameters = new CspParameters
+            {
+                KeyContainerName = KeyName,
+                Flags = CspProviderFlags.UseMachineKeyStore
+            };
+            _rsa = new RSACryptoServiceProvider(parameters)
             {
                 PersistKeyInCsp = true
             };
 
             label1.Text = _rsa.PublicOnly
-                ? $"Key: {_cspp.KeyContainerName} - Public Only"
-                : $"Key: {_cspp.KeyContainerName} - Full Key Pair";
+                ? $"Key: {parameters.KeyContainerName} - Public Only"
+                : $"Key: {parameters.KeyContainerName} - Full Key Pair";
 
             //var lPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Microsoft\Crypto\RSA\MachineKeys");
             //var cp = new CspParameters();
@@ -315,7 +325,8 @@ namespace TestCryptageFile
             // name used to store the RSA key pair.
             var parameters = new CspParameters
             {
-                KeyContainerName = KeyName
+                KeyContainerName = KeyName,
+                Flags = CspProviderFlags.UseMachineKeyStore
             };
 
             // Create a new instance of RSACryptoServiceProvider that accesses
@@ -330,8 +341,9 @@ namespace TestCryptageFile
 
         private void buttonClearKey_Click(object sender, EventArgs e)
         {
-            var cp = new CspParameters { KeyContainerName = KeyName };
-
+            var cp = new CspParameters { KeyContainerName = KeyName,
+                Flags = CspProviderFlags.UseMachineKeyStore
+            };
             // Create a new instance of RSACryptoServiceProvider that accesses
             // the key container.
             var rsa = new RSACryptoServiceProvider(cp) { PersistKeyInCsp = false };
@@ -346,7 +358,7 @@ namespace TestCryptageFile
         {
             var cspParams = new CspParameters
             {
-                Flags = CspProviderFlags.UseExistingKey,
+                Flags = CspProviderFlags.UseExistingKey | CspProviderFlags.UseMachineKeyStore,
                 KeyContainerName = KeyName
             };
 
@@ -387,6 +399,11 @@ namespace TestCryptageFile
             }
 
            
+        }
+
+        private void buttonKeyExist_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(this.CheckKeyExist() ? "La clé existe" : "La clé n'existe pas", "Msg", MessageBoxButtons.OK);
         }
     }
 }
