@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,6 +32,7 @@ namespace TestCryptageFile
         // Key container name for
         // private/public key value pair.
         const string KeyName = "Key01";
+        const int KeySize = 2048;
 
         public Form1()
         {
@@ -44,7 +47,7 @@ namespace TestCryptageFile
                 KeyContainerName = KeyName,
                 Flags = CspProviderFlags.UseMachineKeyStore
             };
-            _rsa = new RSACryptoServiceProvider(parameters)
+            _rsa = new RSACryptoServiceProvider(KeySize, parameters)
             {
                 PersistKeyInCsp = true
             };
@@ -52,6 +55,46 @@ namespace TestCryptageFile
             label1.Text = _rsa.PublicOnly
                 ? $"Key: {parameters.KeyContainerName} - Public Only"
                 : $"Key: {parameters.KeyContainerName} - Full Key Pair";
+
+            GrantUser();
+        }
+
+        private void GrantUser()
+        {
+            var lUserName = "User";
+
+            var lRuntime = System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
+
+            var lFile = Path.Combine(lRuntime, "aspnet_regiis.exe");
+
+            if (File.Exists(lFile))
+            {
+                //var psi = new ProcessStartInfo(lFile)
+                //{
+                //    Arguments = string.Format(@"-pa ""{0}"" ""{1}""", KeyName, lUserName),
+                //    UseShellExecute = false,
+                //    CreateNoWindow = true
+                //};
+
+                Process process = new Process();
+                // Configure the process using the StartInfo properties.
+                process.StartInfo.FileName = lFile;
+                process.StartInfo.Arguments = string.Format(@"-pa ""{0}"" ""{1}""", KeyName, lUserName);
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+
+                //todo comment catcher les erreurs ?
+
+                process.Start();
+                process.WaitForExit();// Waits here for the process to exit.
+            }
+            else
+            {
+                throw new FileNotFoundException("impossible de localiser aspnet_regiis");
+            }
+
+
+
+            // input: "X509Certificate2 cert"
         }
 
         private void buttonEncryptFile_Click(object sender, EventArgs e)
@@ -282,7 +325,7 @@ namespace TestCryptageFile
                     KeyContainerName = KeyName,
                     Flags = CspProviderFlags.UseMachineKeyStore
                 };
-                _rsa = new RSACryptoServiceProvider(parameters);
+                _rsa = new RSACryptoServiceProvider(KeySize, parameters);
 
                 string keytxt = sr.ReadToEnd();
                 _rsa.FromXmlString(keytxt);
@@ -301,7 +344,7 @@ namespace TestCryptageFile
                 KeyContainerName = KeyName,
                 Flags = CspProviderFlags.UseMachineKeyStore
             };
-            _rsa = new RSACryptoServiceProvider(parameters)
+            _rsa = new RSACryptoServiceProvider(KeySize, parameters)
             {
                 PersistKeyInCsp = true
             };
@@ -331,7 +374,7 @@ namespace TestCryptageFile
 
             // Create a new instance of RSACryptoServiceProvider that accesses
             // the key container MyKeyContainerName.
-            var rsa = new RSACryptoServiceProvider(parameters);
+            var rsa = new RSACryptoServiceProvider(KeySize, parameters);
 
             File.WriteAllText("Key.xml", rsa.ToXmlString(true));
 
@@ -346,7 +389,7 @@ namespace TestCryptageFile
             };
             // Create a new instance of RSACryptoServiceProvider that accesses
             // the key container.
-            var rsa = new RSACryptoServiceProvider(cp) { PersistKeyInCsp = false };
+            var rsa = new RSACryptoServiceProvider(KeySize, cp) { PersistKeyInCsp = false };
 
             // Delete the key entry in the container.
 
@@ -364,7 +407,7 @@ namespace TestCryptageFile
 
             try
             {
-                new RSACryptoServiceProvider(cspParams);
+                new RSACryptoServiceProvider(KeySize, cspParams);
             }
             catch (Exception)
             {
@@ -385,7 +428,7 @@ namespace TestCryptageFile
                     Flags = CspProviderFlags.UseMachineKeyStore
                 };
 
-                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(prm))
+                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(KeySize, prm))
                 {
                     using (FileStream fs = new FileStream(fName, FileMode.Open))
                     {
@@ -405,5 +448,7 @@ namespace TestCryptageFile
         {
             MessageBox.Show(this.CheckKeyExist() ? "La clé existe" : "La clé n'existe pas", "Msg", MessageBoxButtons.OK);
         }
+
+        
     }
 }
