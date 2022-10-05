@@ -37,6 +37,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this._encryptOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this._decryptOpenFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.buttonClearKey = new System.Windows.Forms.Button();
+            this.buttonImportKeyFromXml = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonEncryptFile
@@ -116,11 +118,33 @@
             // 
             this._decryptOpenFileDialog.FileName = "openFileDialog2";
             // 
+            // buttonClearKey
+            // 
+            this.buttonClearKey.Location = new System.Drawing.Point(37, 163);
+            this.buttonClearKey.Name = "buttonClearKey";
+            this.buttonClearKey.Size = new System.Drawing.Size(148, 23);
+            this.buttonClearKey.TabIndex = 7;
+            this.buttonClearKey.Text = "buttonClearKey";
+            this.buttonClearKey.UseVisualStyleBackColor = true;
+            this.buttonClearKey.Click += new System.EventHandler(this.buttonClearKey_Click);
+            // 
+            // buttonImportKeyFromXml
+            // 
+            this.buttonImportKeyFromXml.Location = new System.Drawing.Point(366, 178);
+            this.buttonImportKeyFromXml.Name = "buttonImportKeyFromXml";
+            this.buttonImportKeyFromXml.Size = new System.Drawing.Size(144, 23);
+            this.buttonImportKeyFromXml.TabIndex = 8;
+            this.buttonImportKeyFromXml.Text = "buttonImportKeyFromXml";
+            this.buttonImportKeyFromXml.UseVisualStyleBackColor = true;
+            this.buttonImportKeyFromXml.Click += new System.EventHandler(this.buttonImportKeyFromXml_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.buttonImportKeyFromXml);
+            this.Controls.Add(this.buttonClearKey);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonGetPrivateKey);
             this.Controls.Add(this.buttonImportPublicKey);
@@ -146,6 +170,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.OpenFileDialog _encryptOpenFileDialog;
         private System.Windows.Forms.OpenFileDialog _decryptOpenFileDialog;
+        private System.Windows.Forms.Button buttonClearKey;
+        private System.Windows.Forms.Button buttonImportKeyFromXml;
     }
 }
 

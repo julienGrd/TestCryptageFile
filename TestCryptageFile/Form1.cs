@@ -41,6 +41,7 @@ namespace TestCryptageFile
         {
             // Stores a key pair in the key container.
             _cspp.KeyContainerName = KeyName;
+            _cspp.Flags = CspProviderFlags.UseMachineKeyStore;
             _rsa = new RSACryptoServiceProvider(_cspp)
             {
                 PersistKeyInCsp = true
@@ -298,6 +299,94 @@ namespace TestCryptageFile
             label1.Text = _rsa.PublicOnly
                 ? $"Key: {_cspp.KeyContainerName} - Public Only"
                 : $"Key: {_cspp.KeyContainerName} - Full Key Pair";
+
+            //var lPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Microsoft\Crypto\RSA\MachineKeys");
+            //var cp = new CspParameters();
+            //cp.KeyContainerName = KeyName;
+            //var lContainerInfo = new CspKeyContainerInfo(cp);
+            //string lFilename = lContainerInfo.UniqueKeyContainerName;
+
+            GetKeyFromContainer();
+        }
+
+        private static void GetKeyFromContainer()
+        {
+            // Create the CspParameters object and set the key container
+            // name used to store the RSA key pair.
+            var parameters = new CspParameters
+            {
+                KeyContainerName = KeyName
+            };
+
+            // Create a new instance of RSACryptoServiceProvider that accesses
+            // the key container MyKeyContainerName.
+            var rsa = new RSACryptoServiceProvider(parameters);
+
+            File.WriteAllText("Key.xml", rsa.ToXmlString(true));
+
+            // Display the key information to the console.
+            //Console.WriteLine($"Key retrieved from container : \n {}");
+        }
+
+        private void buttonClearKey_Click(object sender, EventArgs e)
+        {
+            var cp = new CspParameters { KeyContainerName = KeyName };
+
+            // Create a new instance of RSACryptoServiceProvider that accesses
+            // the key container.
+            var rsa = new RSACryptoServiceProvider(cp) { PersistKeyInCsp = false };
+
+            // Delete the key entry in the container.
+
+            // Call Clear to release resources and delete the key from the container.
+            rsa.Clear();
+        }
+
+        private bool CheckKeyExist()
+        {
+            var cspParams = new CspParameters
+            {
+                Flags = CspProviderFlags.UseExistingKey,
+                KeyContainerName = KeyName
+            };
+
+            try
+            {
+                new RSACryptoServiceProvider(cspParams);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        private void buttonImportKeyFromXml_Click(object sender, EventArgs e)
+        {
+            if (_decryptOpenFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fName = _encryptOpenFileDialog.FileName;
+
+                var prm = new CspParameters
+                {
+                    KeyContainerName = KeyName,
+                    Flags = CspProviderFlags.UseMachineKeyStore
+                };
+
+                using (RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(prm))
+                {
+                    using (FileStream fs = new FileStream(fName, FileMode.Open))
+                    {
+                        using (StreamReader sr = new StreamReader(fs))
+                        {
+                            rsa.FromXmlString(sr.ReadToEnd());
+                            //txtImportKeyContainer.Text = rsa.CspKeyContainerInfo.KeyContainerName;
+                        }
+                    }
+                }
+            }
+
+           
         }
     }
 }
